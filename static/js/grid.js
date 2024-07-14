@@ -3,8 +3,30 @@ var itemss = [
   { w: 2, content: "another longer widget!" },
   { h: 0, w: 3, content: "another widget!" },
 ];
-var grid = GridStack.init();
+var grid = GridStack.init({
+  //minRow: 3, // don't collapse when empty
+  //cellHeight: 100,
+  acceptWidgets: true, // acceptWidgets - accept widgets dragged from other grids or from outside (default: false).
+  dragIn: ".newWidget", // class that can be dragged from outside
+  dragInOptions: {
+    revert: "invalid",
+    scroll: false,
+    appendTo: "body",
+    helper: "clone",
+  }, // clone or can be your function
+  removable: ".trash", // drag-out delete class
+});
+
 //grid.load(items);
+
+//gridstack on change
+grid.on("added removed change", function (e, items) {
+  let str = "";
+  items.forEach(function (item) {
+    str += " (x,y)=" + item.x + "," + item.y;
+  });
+  console.log(e.type + " " + items.length + " items:" + str);
+});
 
 function addItem() {
   // $("#myModal").modal("show");
@@ -87,6 +109,9 @@ function createWidget() {
 
   if ($(".widgetSelection").val() == "radialbar") {
     radialchart(widgetID);
+    $(".widgetSelection").val("select");
+  } else if ($(".widgetSelection").val() == "spikechart") {
+    spikeChart(widgetID);
     $(".widgetSelection").val("select");
   }
   widgetCount++;
@@ -204,3 +229,88 @@ window.setInterval(function () {
 
   
 }, 3000);*/
+
+function spikeChart(widgetID) {
+  var optionsSpark3 = {
+    series: [
+      {
+        data: randomizeArray(sparklineData),
+      },
+    ],
+    chart: {
+      id: widgetID,
+      type: "area",
+      height: 350,
+      sparkline: {
+        enabled: true,
+      },
+    },
+    stroke: {
+      curve: "straight",
+    },
+    fill: {
+      opacity: 0.3,
+    },
+    xaxis: {
+      crosshairs: {
+        width: 1,
+      },
+    },
+    yaxis: {
+      min: 0,
+    },
+    title: {
+      text: "$135,965",
+      offsetX: 0,
+      style: {
+        fontSize: "14px",
+      },
+    },
+    subtitle: {
+      text: "Profits",
+      offsetX: 0,
+      style: {
+        fontSize: "14px",
+      },
+    },
+  };
+
+  chartSpark3 = new ApexCharts(
+    document.querySelector("#" + widgetID),
+    optionsSpark3
+  );
+  chartSpark3.render();
+}
+
+var chartSpark3 = "";
+var randomizeArray = function (arg) {
+  var array = arg.slice();
+  var currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
+
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+};
+
+// data for the sparklines that appear below header area
+var sparklineData = [
+  47, 45, 54, 38, 56, 24, 65, 31, 37, 39, 62, 51, 35, 41, 35, 27, 93, 53, 61,
+  27, 54, 43, 19, 46,
+];
+
+$("body").on("click", ".item-remove", function (e) {
+  e.preventDefault();
+  var grid = $(".grid-stack").data("gridstack"),
+    el = $(this).closest(".grid-stack-item");
+
+  grid.removeWidget(el);
+});

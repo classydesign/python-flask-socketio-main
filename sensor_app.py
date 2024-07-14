@@ -30,7 +30,7 @@ def background_thread():
         dummy_sensor_value = randint(1, 100)
         #round(random() * 100, 3)
         #socketio.emit('updateSensorData', {'value': dummy_sensor_value, "date": get_current_datetime()})
-        socketio.emit('updateSensorData', [{'threshold':20,'chartid':"chart1",'value': dummy_sensor_value*.5,'edgeDevice':"IIoTTest5"},{'threshold':50,'chartid':"chart2",'value': dummy_sensor_value,'edgeDevice':"IIoTTest2"}])
+        socketio.emit('updateSensorData', [{'threshold':20,'chartid':"chart1",'value': dummy_sensor_value*.5,'edgeDevice':"IIoTTest5"},{'threshold':50,'chartid':"chart2",'value': dummy_sensor_value,'edgeDevice':"IIoTTest2"},{'threshold':'','chartid':"chart3",'value': dummy_sensor_value,'edgeDevice':"IIoTTest3"}])
         socketio.sleep(3)
 
 """
